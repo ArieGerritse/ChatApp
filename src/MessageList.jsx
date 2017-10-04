@@ -12,10 +12,11 @@ class MessageList extends Component {
     return (
       <div>
         <main className="messages">
-        {this.props.name.map((eachMessage) => {
-           return <Message name={eachMessage}/>
-        })
-      }
+
+        {this.props.allMessages.map((eachMessage, id) => {
+            return <Message message={eachMessage} key={id}/>
+          })
+        }
         </main>
       </div>
     );
