@@ -2,11 +2,15 @@ import React, {Component} from 'react';
 import ChatBar from './ChatBar.jsx';
 import MessageList from './MessageList.jsx';
 
+// const server = new WebSocket("ws:localhost:3001");
+
+
 class App extends Component {
   constructor(props){
     super(props);
     this.newMessage = this.newMessage.bind(this);
     this.state = {
+      connect: {server: new WebSocket("ws:localhost:3001")},
   currentUser: {name: "Bob"}, // optional. if currentUser is not defined, it means the user is Anonymous
   messages: [
     {
@@ -25,20 +29,31 @@ class App extends Component {
 
   }
 
+
+  componentDidMount(){
+    this.state.connect.server.onopen = function (event) {
+      console.log('Server is running');
+    };
+
+    // server.onopen = function (event) {
+    //   server.send("TESTINNGGGGGGG");
+    // };
+
+  };
+
   newMessage(newUsername, message){
-    let newID = this.state.messages.length + 1;
     let username = '';
-    console.log(newUsername);
     if(newUsername === ''){
       username = 'Anonymous';
     }else {
       username = newUsername;
     }
-    const newMessage = {id: newID, username: username, content: message};
-    const newMessages = this.state.messages.concat(newMessage);
-    this.setState({messages: newMessages})
-  }
+    const newMessage = {username: username, content: message};
+    // const newMessages = this.state.messages.concat(newMessage);
+    this.setState({messages: newMessages});
+    this.state.connect.server.send(JSON.stringify(newMessages[this.state.messages.length]));
 
+  }
 
   render() {
     return (
