@@ -18,30 +18,16 @@ const wss = new SocketServer({
   server
 });
 
-// Set up a callback that will run when a client connects to the server
-// When a client connects they are assigned a socket, represented by
-// the ws parameter in the callback.
-wss.on('connection', (ws) => {
-  console.log('Client connected');
-
-  collectFromUser(ws);
-
-  ws.send('something');
-
-  // Set up a callback for when a client closes the socket. This usually means they closed their browser.
-  ws.on('close', () => console.log('Client disconnected'));
-});
-
-function collectFromUser(ws) {
+function collectFromUser() {
 
   ws.on('message', function incoming(message) {
     let parsed = JSON.parse(message);
-    createComment(parsed, ws);
+    createComment(parsed);
   });
 
 }
 
-function createComment(input, ws) {
+function createComment(input) {
 
   let message = {
     id: uuidv4(),
@@ -49,18 +35,30 @@ function createComment(input, ws) {
     content: input.content
   };
 
-  sendToUsers(JSON.stringify(message), ws);
+  sendToUsers(JSON.stringify(message));
 
 }
 
-function sendToUsers(JSONstring, ws) {
+function sendToUsers(JSONstring) {
 
-  // wss.clients.forEach(function each(client) {
-  //   if (client.readyState === WebSocket.OPEN) {
-  //     client.send(JSONstring);
-  //   }
-  // });
+  wss.clients.forEach((client) => {
 
-  ws.send(JSONstring);
+    client.send(JSONstring);
 
+  });
 }
+
+// Set up a callback that will run when a client connects to the server
+// When a client connects they are assigned a socket, represented by
+// the ws parameter in the callback.
+wss.on('connection', (ws) => {
+  console.log('Client connected');
+
+  ws.on('message', function incoming(message) {
+    let parsed = JSON.parse(message);
+    createComment(s);
+  });
+
+  // Set up a callback for when a client closes the socket. This usually means they closed their browser.
+  ws.on('close', () => console.log('Client disconnected'));
+});

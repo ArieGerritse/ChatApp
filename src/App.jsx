@@ -12,18 +12,7 @@ class App extends Component {
     this.state = {
       connect: {server: new WebSocket("ws:localhost:3001")},
   currentUser: {name: "Bob"}, // optional. if currentUser is not defined, it means the user is Anonymous
-  messages: [
-    {
-      username: "Bob",
-      content: "Has anyone seen my marbles?",
-      id: 1
-    },
-    {
-      username: "Anonymous",
-      content: "No, I think you lost them. You lost your marbles Bob. You lost them for good.",
-      id: 2
-    }
-  ]
+  messages: []
 };
 
 
@@ -31,21 +20,17 @@ class App extends Component {
 
 
   componentDidMount(){
-    this.state.connect.server.onopen = function (event) {
-      console.log('Server is running');
-    };
+
+    this.state.connect.server.addEventListener('message', event =>{
+
+      var newMessage = JSON.parse(event.data);
+      const newMessages = this.state.messages.concat(newMessage);
+      this.setState({messages: newMessages});
+
+    })
+
   };
 
-  receiveMessage(){
-  this.state.connect.server.onmessage = function(event){
-
-    var newMessage = JSON.parse(event.data);
-
-    const newMessages = this.state.messages.concat(newMessage);
-    this.setState({messages: newMessages});
-
-  }
-}
 
   newMessage(newUsername, message){
     let username = '';
@@ -55,8 +40,10 @@ class App extends Component {
       username = newUsername;
     }
     const newMessage = {username: username, content: message};
-    this.state.connect.server.send(JSON.stringify(newMessages[this.state.messages.length]));
-
+    let newUser = {name: username};
+    this.state.connect.server.send(JSON.stringify(newMessage));
+    this.setState({CurrentUser: newUser});
+    console.log(this.state.currentUser);
 
   }
 
