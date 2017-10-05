@@ -34,12 +34,18 @@ class App extends Component {
     this.state.connect.server.onopen = function (event) {
       console.log('Server is running');
     };
-
-    // server.onopen = function (event) {
-    //   server.send("TESTINNGGGGGGG");
-    // };
-
   };
+
+  receiveMessage(){
+  this.state.connect.server.onmessage = function(event){
+
+    var newMessage = JSON.parse(event.data);
+
+    const newMessages = this.state.messages.concat(newMessage);
+    this.setState({messages: newMessages});
+
+  }
+}
 
   newMessage(newUsername, message){
     let username = '';
@@ -49,9 +55,8 @@ class App extends Component {
       username = newUsername;
     }
     const newMessage = {username: username, content: message};
-    // const newMessages = this.state.messages.concat(newMessage);
-    this.setState({messages: newMessages});
     this.state.connect.server.send(JSON.stringify(newMessages[this.state.messages.length]));
+
 
   }
 

@@ -10,7 +10,6 @@ class ChatBar extends Component {
   handleChange(event){
     if(event.key === 'Enter'){
     this.props.newMessage(document.getElementById('username').value, document.getElementById('newContent').value);
-    document.getElementById('username').value = '';
     document.getElementById('newContent').value = '';
     }
   };

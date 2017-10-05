@@ -36,17 +36,31 @@ function collectFromUser(ws) {
 
   ws.on('message', function incoming(message) {
     let parsed = JSON.parse(message);
-    createComment(parsed);
+    createComment(parsed, ws);
   });
 
 }
 
-function createComment(input) {
+function createComment(input, ws) {
 
   let message = {
     id: uuidv4(),
     username: input.username,
     content: input.content
   };
+
+  sendToUsers(JSON.stringify(message), ws);
+
+}
+
+function sendToUsers(JSONstring, ws) {
+
+  // wss.clients.forEach(function each(client) {
+  //   if (client.readyState === WebSocket.OPEN) {
+  //     client.send(JSONstring);
+  //   }
+  // });
+
+  ws.send(JSONstring);
 
 }
