@@ -14,6 +14,11 @@ class ChatBar extends Component {
     }
   };
 
+  sendNotification(newUsername, oldUsername){
+    let newNotification = {type: "postNotification", username: newUsername, oldUsername: oldUsername};
+    this.state.connect.server.send(JSON.stringify(newNotification));
+  }
+
   render(){
     return (
   <footer className="chatbar">

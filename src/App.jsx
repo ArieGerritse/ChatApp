@@ -14,8 +14,7 @@ class App extends Component {
       connect: {server: new WebSocket("ws:localhost:3001")},
   currentUser: {name: "Anonymous"}, // optional. if currentUser is not defined, it means the user is Anonymous
   messages: [],
-  notifications: [],
-  onlineUsers: 0,
+  onlineUsers: 1,
   color: "black"
 };
 
@@ -27,9 +26,12 @@ class App extends Component {
 
     this.state.connect.server.addEventListener('message', event =>{
       let newMessage = JSON.parse(event.data);
-      const newMessages = this.state.messages.concat(newMessage);
-      this.setState({messages: newMessages});
-
+      if(newMessage.type === 'numbersOnline'){
+        this.setState({onlineUsers: newMessage.online});
+      }else {
+        const newMessages = this.state.messages.concat(newMessage);
+        this.setState({messages: newMessages});
+      }
     })
 
   };
@@ -42,14 +44,13 @@ class App extends Component {
   newMessage(newUsername, message){
     let newMessage = {};
     if(newUsername === this.state.currentUser.name || newUsername === ''){
-      console.log('the same');
-      newMessage = {type: "postMessage", username: this.state.currentUser.name, content: message};
+      newMessage = {type: "postMessage", username: this.state.currentUser.name, content: message, color: this.state.color};
     } else {
-      newMessage = {type: "postMessage", username: newUsername, content: message};
-      console.log(this.state.currentUser.name)
-      // sendNotification(newUsername, newUsername)
-      this.state.currentUser.name = newUsername;
       this.state.color = getRandomColor();
+      let newNotification = {type: "postNotification", username: newUsername, oldUsername: this.state.currentUser.name};
+      this.state.connect.server.send(JSON.stringify(newNotification));
+      newMessage = {type: "postMessage", username: newUsername, content: message, color: this.state.color};
+      this.state.currentUser.name = newUsername;
     }
     this.state.connect.server.send(JSON.stringify(newMessage));
   }
@@ -60,6 +61,7 @@ class App extends Component {
       <div className='Chatty'>
       <nav className="navbar">
       <a href="/" className="navbar-brand">Chatty</a>
+      <span className="online">Online {this.state.onlineUsers}</span>
       </nav>
       <MessageList allMessages={this.state}/>
       <ChatBar newMessage={this.newMessage} currentUser={this.state.currentUser.name} />

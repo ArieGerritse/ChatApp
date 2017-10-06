@@ -11,13 +11,14 @@ class MessageList extends Component {
   render(){
 
     const messages = this.props.allMessages.messages.map(messages =>{
-      console.log(this.props.allMessages.color);
       switch (messages.type) {
-        case "postMessage":
-          return <Message key={messages.id} username={messages.username} content={messages.content} style={"color:blue"}/>;
+        case "incomingMessage":
+          return <Message key={messages.id} username={messages.username} content={messages.content} color={{color: messages.color}} />
           break;
         case "incomingNotification":
-          return <Notification key={messages.id} oldUsername={messages.oldUsername} newUsername={messages.newUsername}/>;
+          console.log(messages);
+          console.log('Got into here!');
+          return <Message key={messages.id} content={`${messages.oldUsername} has changed thier name to ${messages.username}`} />
           break;
       }
     })
