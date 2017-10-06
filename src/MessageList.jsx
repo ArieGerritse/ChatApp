@@ -9,15 +9,22 @@ class MessageList extends Component {
 
 
   render(){
-    return (
-      <div>
-        <main className="messages">
 
-        {this.props.allMessages.map((eachMessage, id) => {
-            return <Message message={eachMessage} key={id}/>
-          })
-        }
-        </main>
+    const messages = this.props.allMessages.messages.map(messages =>{
+      console.log(this.props.allMessages.color);
+      switch (messages.type) {
+        case "postMessage":
+          return <Message key={messages.id} username={messages.username} content={messages.content} style={"color:blue"}/>;
+          break;
+        case "incomingNotification":
+          return <Notification key={messages.id} oldUsername={messages.oldUsername} newUsername={messages.newUsername}/>;
+          break;
+      }
+    })
+
+    return (
+      <div className="messages">
+        {messages}
       </div>
     );
   }

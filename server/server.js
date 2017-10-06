@@ -18,35 +18,37 @@ const wss = new SocketServer({
   server
 });
 
-function collectFromUser() {
+// function createComment(input) {
 
-  ws.on('message', function incoming(message) {
-    let parsed = JSON.parse(message);
-    createComment(parsed);
+//   let message = {
+//     type: "incomingMessage",
+//     id: uuidv4(),
+//     username: input.username,
+//     content: input.content
+//   };
+
+//   return JSON.stringify(message);
+
+// }
+
+// function createNotification(input) {
+
+//   let message = {
+//     type: "incomingNotification",
+//     id: uuidv4(),
+//     username: input.username,
+//     oldUsername: input.old
+//   };
+
+//   return JSON.stringify(message);
+
+// }
+
+wss.broadcast = function broadcast(data) {
+  wss.clients.forEach(function each(client) {
+    client.send(data);
   });
-
-}
-
-function createComment(input) {
-
-  let message = {
-    id: uuidv4(),
-    username: input.username,
-    content: input.content
-  };
-
-  sendToUsers(JSON.stringify(message));
-
-}
-
-function sendToUsers(JSONstring) {
-
-  wss.clients.forEach((client) => {
-
-    client.send(JSONstring);
-
-  });
-}
+};
 
 // Set up a callback that will run when a client connects to the server
 // When a client connects they are assigned a socket, represented by
@@ -56,7 +58,19 @@ wss.on('connection', (ws) => {
 
   ws.on('message', function incoming(message) {
     let parsed = JSON.parse(message);
-    createComment(s);
+    switch (parsed.type) {
+      case 'postMessage':
+        parsed.id = uuidv4();
+        parsed.type = "incomingMessage";
+        break;
+      case 'postNotification':
+        parsed.id = uuidv4();
+        parsed.type = "incomingNotification";
+        break;
+      case 'postImage':
+        break;
+    }
+    wss.broadcast(JSON.stringify(parsed));
   });
 
   // Set up a callback for when a client closes the socket. This usually means they closed their browser.
