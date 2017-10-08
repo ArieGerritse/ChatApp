@@ -11,7 +11,9 @@ const PORT = 3001;
 const server = express()
   // Make the express server serve static assets (html, javascript, css) from the /public folder
   .use(express.static('public'))
-  .listen(PORT, '0.0.0.0', 'localhost', () => console.log(`Listening on ${ PORT }`));
+  .listen(PORT, '0.0.0.0', 'localhost', () =>
+    console.log(`Listening on ${PORT}`)
+  );
 
 // Create the WebSockets server
 const wss = new SocketServer({
@@ -29,12 +31,14 @@ let numberOnline = 0;
 // Set up a callback that will run when a client connects to the server
 // When a client connects they are assigned a socket, represented by
 // the ws parameter in the callback.
-wss.on('connection', (ws) => {
+wss.on('connection', ws => {
   numberOnline++;
-  wss.broadcast(JSON.stringify({
-    online: numberOnline,
-    type: 'numbersOnline'
-  }));
+  wss.broadcast(
+    JSON.stringify({
+      online: numberOnline,
+      type: 'numbersOnline'
+    })
+  );
   console.log('Client connected');
 
   ws.on('message', function incoming(message) {
@@ -42,11 +46,11 @@ wss.on('connection', (ws) => {
     switch (parsed.type) {
       case 'postMessage':
         parsed.id = uuidv4();
-        parsed.type = "incomingMessage";
+        parsed.type = 'incomingMessage';
         break;
       case 'postNotification':
         parsed.id = uuidv4();
-        parsed.type = "incomingNotification";
+        parsed.type = 'incomingNotification';
         break;
       case 'postImage':
         break;
@@ -57,10 +61,12 @@ wss.on('connection', (ws) => {
   // Set up a callback for when a client closes the socket. This usually means they closed their browser.
   ws.on('close', () => {
     numberOnline--;
-    wss.broadcast(JSON.stringify({
-      online: numberOnline,
-      type: 'numbersOnline'
-    }));
+    wss.broadcast(
+      JSON.stringify({
+        online: numberOnline,
+        type: 'numbersOnline'
+      })
+    );
     console.log('Client disconnected ');
   });
 });

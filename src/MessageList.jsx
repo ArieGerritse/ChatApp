@@ -1,33 +1,34 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import Message from './Message.jsx';
 
-
 class MessageList extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
   }
 
-
-  render(){
-
-    const messages = this.props.allMessages.messages.map(messages =>{
+  render() {
+    const messages = this.props.allMessages.messages.map(messages => {
       switch (messages.type) {
-        case "incomingMessage":
-          return <Message key={messages.id} username={messages.username} content={messages.content} color={{color: messages.color}} />
-          break;
-        case "incomingNotification":
-          console.log(messages);
-          console.log('Got into here!');
-          return <Message key={messages.id} content={`${messages.oldUsername} has changed thier name to ${messages.username}`} />
-          break;
+        case 'incomingMessage':
+          return (
+            <Message
+              key={messages.id}
+              username={messages.username}
+              content={messages.content}
+              color={{ color: messages.color }}
+            />
+          );
+        case 'incomingNotification':
+          return (
+            <Message
+              key={messages.id}
+              content={`${messages.oldUsername} has changed thier name to ${messages.username}`}
+            />
+          );
       }
-    })
+    });
 
-    return (
-      <div className="messages">
-        {messages}
-      </div>
-    );
+    return <div className="messages">{messages}</div>;
   }
 }
 
